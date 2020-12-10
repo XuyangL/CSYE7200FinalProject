@@ -1,12 +1,9 @@
-*.class
-*.log
+play-project/logs
+play-project/target
+play-project/.idea
+play-project/.idea_modules
+play-project/.classpath
+play-project/.project
+play-project/.settings
+play-project/RUNNING_PID
 
-target/
-project/target/
-api/
-
-*.iml
-.idea
-
-output\.html
-/CSYEoutput.html

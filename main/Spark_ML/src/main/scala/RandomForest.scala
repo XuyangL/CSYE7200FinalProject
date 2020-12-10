@@ -10,7 +10,7 @@ object RandomForest {
   def main(args: Array[String]): Unit = {
 
     // Load data
-    val cleanDf = Pre.process(Pre.loadData("./cs-training.csv")).cache()
+    val cleanDf = Pre.process(Pre.loadData("./dataset/cs-training.csv")).cache()
 
     // Random Forest
 
