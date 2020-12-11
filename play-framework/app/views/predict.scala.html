@@ -1,0 +1,23 @@
+@import helper._
+
+@(userForm: Form[BasicForm])(implicit messages: Messages)
+
+@main("Predict") {
+    @heading()
+
+    <h1>Please input something!</h1>
+
+    @form(action = routes.HomeController.simpleFormPost()) {
+        @inputText(userForm("CreditUsage"))
+        @inputText(userForm("Age"))
+        @inputText(userForm("PastDue_30_59"))
+        @inputText(userForm("DebtRatio"))
+        @inputText(userForm("MonthlyIncome"))
+        @inputText(userForm("NumberOfOpenCreditLinesAndLoans"))
+        @inputText(userForm("PastDue_90"))
+        @inputText(userForm("NumberRealEstateLoansOrLines"))
+        @inputText(userForm("PastDue_60_89"))
+        @inputText(userForm("Dependents"))
+    <input type="submit" value="Submit">
+    }
+}
