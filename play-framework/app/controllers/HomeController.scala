@@ -5,6 +5,10 @@ import javax.inject.Singleton
 import play.api._
 import play.api.mvc._
 import models._
+import org.apache.spark.ml.{Pipeline, PipelineModel}
+import org.apache.spark.sql.SparkSession
+
+import scala.concurrent.Future
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -24,31 +28,53 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
     Ok(views.html.index())
   }
 
+  def aboutus() = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.aboutus())
+  }
+
   def predict() = Action {  implicit request: Request[AnyContent] =>
+    Ok(views.html.predict(BasicForm.form))
+  }
+
+  def decision() = Action {  implicit request: Request[AnyContent] =>
     Ok(views.html.predict(BasicForm.form))
   }
 
   def simpleFormPost() = Action { implicit request =>
     BasicForm.form.bindFromRequest.fold(
       formWithErrors => {
-        // binding failure, you retrieve the form containing errors:
         BadRequest(views.html.predict(formWithErrors))
       },
-      formData => {
+      success = formData => {
         val formData: BasicForm = BasicForm.form.bindFromRequest.get
-        println(formData)
-        val result1 = predictLR(formData)
-        val result2 = predictRF(formData)
-        Ok(views.html.predict(BasicForm.form, result1, result2))
+        val predictData = BasicForm.unapply(formData).get
+
+        val lr = predictLR(predictData)
+        val rf = predictRF(predictData)
+
+        val col = List("CreditUsage", "Age", "PastDue_30_59", "DebtRatio", "MonthlyIncome", "NumberOfOpenCreditLinesAndLoans", "PastDue_90", "NumberRealEstateLoansOrLines", "PastDue_60_89", "Dependents")
+        val predictDataList = List(predictData._1, predictData._2, predictData._3, predictData._4, predictData._5, predictData._6, predictData._7, predictData._8, predictData._9, predictData._10).map(_ toString)
+        val target = col.zip(predictDataList)
+
+        Ok(views.html.predictresult(target, rf, lr))
       }
     )
   }
 
-  def predictLR(formData: Any) : String = {
+  def predictLR(predictData: (BigDecimal, Int, Int, BigDecimal, Int, Int, Int, Int, Int, Int)) : String = {
     0.85.toString
   }
 
-  def predictRF(formData: Any) : String = {
-    "Yes"
+  def predictRF(predictData: (BigDecimal, Int, Int, BigDecimal, Int, Int, Int, Int, Int, Int)) : String = {
+    val spark = SparkSession.builder().appName("Analyze").master("local[*]").getOrCreate()
+    import spark.implicits._
+    val rfLoaded = PipelineModel.load("./RandomForest_Pipeline_model")
+    val testDf = Seq(predictData).toDF("CreditUsage", "Age", "PastDue_30_59", "DebtRatio", "MonthlyIncome", "NumberOfOpenCreditLinesAndLoans", "PastDue_90", "NumberRealEstateLoansOrLines", "PastDue_60_89", "Dependents")
+    val testResDf = rfLoaded.transform(testDf)
+    val output = testResDf.select($"prediction").rdd.collect().map(x => x.getDouble(0))
+    output(0).toString() match {
+      case "0.0" => "Yes"
+      case "1.0" => "No"
+    }
   }
 }

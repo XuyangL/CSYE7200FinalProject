@@ -4,7 +4,9 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
+
+GET     /index                      controllers.HomeController.index
+GET     /aboutus                    controllers.HomeController.aboutus
 
 GET     /predict                    controllers.HomeController.predict
 POST    /predict                    controllers.HomeController.simpleFormPost

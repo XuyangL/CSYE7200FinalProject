@@ -1,8 +1,10 @@
 @import helper._
 
-@(userForm: Form[BasicForm], lr: String = "", rf: String = "")(implicit messages: Messages)
+@(userForm: Form[BasicForm])(implicit messages: Messages)
 
-@main("Let's predict one's loan!") {
+@main("Predict") {
+    @heading()
+
     <h1>Please input something!</h1>
 
     @form(action = routes.HomeController.simpleFormPost()) {
@@ -18,7 +20,4 @@
         @inputText(userForm("Dependents"))
     <input type="submit" value="Submit">
     }
-
-    <h2>@lr</h2>
-    <h2>@rf</h2>
 }
