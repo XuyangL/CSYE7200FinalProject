@@ -68,7 +68,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
   def predictRF(predictData: (BigDecimal, Int, Int, BigDecimal, Int, Int, Int, Int, Int, Int)) : String = {
     val spark = SparkSession.builder().appName("Analyze").master("local[*]").getOrCreate()
     import spark.implicits._
-    val rfLoaded = PipelineModel.load("./RandomForest_Pipeline_model")
+    val rfLoaded = PipelineModel.load("../main/Spark_ML/RandomForest_Pipeline_model")
     val testDf = Seq(predictData).toDF("CreditUsage", "Age", "PastDue_30_59", "DebtRatio", "MonthlyIncome", "NumberOfOpenCreditLinesAndLoans", "PastDue_90", "NumberRealEstateLoansOrLines", "PastDue_60_89", "Dependents")
     val testResDf = rfLoaded.transform(testDf)
     val output = testResDf.select($"prediction").rdd.collect().map(x => x.getDouble(0))
