@@ -53,14 +53,16 @@ class PreProcess {
     // Show min, max, mean, std_dev
     // cleanTypeDF.describe().show()
 
-    // Fill null value in MonthlyIncome and Dependents with mean
+    // Fill null value with mean
     // val imputer = new Imputer().setInputCols(cleanTypeDF.columns).setOutputCols(cleanTypeDF.columns.map(c => s"${c}_imputed")).setStrategy("mean")
     // val fillZeroDF = imputer.fit(cleanTypeDF).transform(cleanTypeDF)
 
+    // Fill null age with average age
     cleanTypeDf.createOrReplaceTempView("cleanTemp1")
-    val avg_Age = spark.sql("SELECT avg(Age) FROM cleanTemp1 WHERE Dependents >= 14").first().getDouble(0)
+    val avg_Age = spark.sql("SELECT avg(Age) FROM cleanTemp1 WHERE Age >= 14").first().getDouble(0)
     val fillZeroDf1 = cleanTypeDf.na.fill(avg_Age, Seq("Age"))
 
+    // Fill null MonthlyIncome with average MonthlyIncome
     fillZeroDf1.createOrReplaceTempView("cleanTemp2")
     // val work_MonthlyIncome = spark.sql("SELECT avg(MonthlyIncome) FROM cleanTemp2 WHERE AGE > 17 and Age < 61").first().getDouble(0)
     // val senior_MonthlyIncome = spark.sql("SELECT avg(MonthlyIncome) FROM cleanTemp2 WHERE Age > 60").first().getDouble(0)
@@ -68,6 +70,7 @@ class PreProcess {
     val avg_MonthlyIncome = spark.sql("SELECT avg(MonthlyIncome) FROM cleanTemp2").first().getDouble(0)
     val fillZeroDf2 = fillZeroDf1.na.fill(avg_MonthlyIncome, Seq("MonthlyIncome"))
 
+    // Fill null Dependents with median Dependents
     fillZeroDf2.createOrReplaceTempView("cleanTemp3")
     val median_Dependents = spark.sql("SELECT percentile_approx(Dependents, 0.5) FROM cleanTemp3").first().getInt(0)
     val fillZeroDf3 = fillZeroDf2.na.fill(median_Dependents, Seq("Dependents"))
@@ -82,7 +85,7 @@ class PreProcess {
     val unbalancedRatio = (100*(target_1.count().toDouble / df.count().toDouble)).round
     val sampleRatio = (30 / unbalancedRatio).toInt
     var seqDf = Seq[DataFrame]()
-    for (i <- 0 to sampleRatio) {
+    for (i <- 1 to sampleRatio) {
       seqDf = target_1 +: seqDf
     }
     val reduceDf = seqDf.reduce(_ union _)

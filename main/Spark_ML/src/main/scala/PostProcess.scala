@@ -16,7 +16,7 @@ class PostProcess {
     }
   }
 
-  // Rename csv file and clean out folder
+  // Rename part file and clean out folder
   def cleanOutput(oldFile: String, newFile: String): Unit = {
     val sc: SparkContext = spark.sparkContext
     val fs = FileSystem.get(sc.hadoopConfiguration)

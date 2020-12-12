@@ -1,0 +1,6 @@
+,SeriousDlqin2yrs,RevolvingUtilizationOfUnsecuredLines,age,NumberOfTime30-59DaysPastDueNotWorse,DebtRatio,MonthlyIncome,NumberOfOpenCreditLinesAndLoans,NumberOfTimes90DaysLate,NumberRealEstateLoansOrLines,NumberOfTime60-89DaysPastDueNotWorse,NumberOfDependents
+1,1,0.1,,1,0.1,,0,0,0,0,
+2,0,0.2,20,2,0.2,2000,4,0,0,0,1
+3,0,0.6,60,6,0.6,6000,2,1,0,0,1
+4,0,0.3,30,3,0.3,3000,5,0,0,0,3
+5,0,0.5,50,5,0.5,5000,7,0,1,0,3

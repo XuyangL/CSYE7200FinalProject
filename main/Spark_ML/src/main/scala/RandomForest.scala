@@ -67,7 +67,7 @@ object RandomForest {
     println(s"Random Forest Pipeline Accuracy = ${pipelineAccuracy}")
 
     // Save model
-    // pipelineModel.write.overwrite().save("./RandomForest_Pipeline_model_2")
+    // pipelineModel.write.overwrite().save("./RandomForest_Pipeline_model")
     Pre.spark.stop()
   }
 }

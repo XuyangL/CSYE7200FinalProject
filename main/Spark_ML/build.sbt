@@ -1,3 +1,5 @@
+import sbt.Keys.libraryDependencies
+
 name := "Analysis"
 
 version := "0.1"
@@ -18,5 +20,14 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-hive" % "3.0.1" % "provided",
 
   // https://mvnrepository.com/artifact/org.apache.spark/spark-mllib
-  "org.apache.spark" %% "spark-mllib" % "3.0.1"
+  "org.apache.spark" %% "spark-mllib" % "3.0.1",
+
+  // https://mvnrepository.com/artifact/org.scalatest/scalatest
+  "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+
+  // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+  "org.apache.logging.log4j" % "log4j-core" % "2.4.1",
+
+  // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api
+  "org.apache.logging.log4j" % "log4j-api" % "2.4.1"
 )
