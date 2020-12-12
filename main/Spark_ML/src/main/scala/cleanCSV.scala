@@ -1,3 +1,5 @@
+
+
 object cleanCSV {
 
   val Pre = new PreProcess
@@ -6,7 +8,9 @@ object cleanCSV {
 
   def main(args: Array[String]): Unit = {
     // Load data
-    val cleanDf = Pre.process(Pre.loadData("./cs-training.csv")).cache()
+    // val cleanDf = Pre.process(Pre.loadData("./cs-training.csv")).cache()
+    val cleanDf_tmp = Pre.process(Pre.loadData("./cs-training.csv")).cache()
+    val cleanDf = Pre.upSample(cleanDf_tmp).cache()
 
     Post.toCSV(cleanDf, "result_clean-train.csv")
 
