@@ -1,0 +1,25 @@
+@(record: Record)
+
+@main("Record Detail") {
+@heading()
+<h1>Record Detail</h1>
+ <ul>
+     <li>Id: @record.id</li>
+     <li>CreditUsage: @record.recordData(0)</li>
+     <li>Age: @record.recordData(1)</li>
+     <li>PastDue_30_59: @record.recordData(2)</li>
+     <li>DebtRatio: @record.recordData(3)</li>
+     <li>MonthlyIncome: @record.recordData(4)</li>
+     <li>NumberOfOpenCreditLinesAndLoans: @record.recordData(5)</li>
+     <li>PastDue_90: @record.recordData(6)</li>
+     <li>NumberRealEstateLoansOrLines: @record.recordData(7)</li>
+     <li>PastDue_60_89: @record.recordData(8)</li>
+     <li>Dependents: @record.recordData(9)</li>
+     <li>Random Forest Result: @record.rf</li>
+     <li>Logistic Regression Result: @record.lr</li>
+     <li>Comments: @record.decision </li>
+     <li>Time: @record.time</li>
+ </ul>
+
+    <a href="@routes.HomeController.record">Back</a>
+}

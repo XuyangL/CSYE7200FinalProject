@@ -26,3 +26,12 @@ object BasicForm {
   )
 }
 
+case class DecisionForm(comments: String)
+
+object DecisionForm {
+
+  val form: Form[DecisionForm] = Form(
+    mapping("comments" -> text)(DecisionForm.apply)(DecisionForm.unapply)
+  )
+}
+

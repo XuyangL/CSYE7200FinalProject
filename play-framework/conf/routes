@@ -11,7 +11,11 @@ GET     /aboutus                    controllers.HomeController.aboutus
 GET     /predict                    controllers.HomeController.predict
 POST    /predict                    controllers.HomeController.simpleFormPost
 
+GET     /predictresult              controllers.HomeController.predictresult(data: List[String], rf: String, lr: String)
+POST    /predictresult              controllers.HomeController.decisionPost(data: List[String], rf: String, lr: String)
 
+GET     /record                     controllers.HomeController.record
+GET     /recorddetail               controllers.HomeController.recorddetail(id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

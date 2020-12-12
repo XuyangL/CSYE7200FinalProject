@@ -1,8 +1,12 @@
-@(predictData: List[(String, String)], rf: String, lr: String)(implicit messages: Messages)
+@import helper._
+
+@(decisionForm : Form[DecisionForm], predictData: List[(String, String)], rf: String, lr: String)(implicit messages: Messages)
+
 @main("Predict Result") {
     @heading()
     <div>
         <h2>Predict Data:</h2>
+        <ul>
         @for(item <- predictData){
             <li>@item._1 : @item._2</li>
         }
@@ -15,10 +19,9 @@
         <p>Logistic Regression: @lr</p>
     </div>
 
-    <h2>You decisions: </h2>
-    <div>
-        <li><a href="@routes.HomeController.index()">Approve</a></li>
-        <li><a href="@routes.HomeController.index()">Decline</a></li>
-        <li><a href="@routes.HomeController.index()">Uncertain</a></li>
-    </div>
+    <h2>Your Comments: </h2>
+    @form(action = routes.HomeController.decisionPost((for((x,y)<-predictData) yield y), rf, lr)) {
+        @textarea(decisionForm("comments"))
+    <input type="submit" value="Submit">
+    }
 }
