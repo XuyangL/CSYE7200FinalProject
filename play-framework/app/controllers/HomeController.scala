@@ -5,6 +5,8 @@ import javax.inject.Singleton
 import play.api._
 import play.api.mvc._
 import models._
+import play.api.data.Form
+import play.api.data.Forms._
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.sql.SparkSession
 
@@ -37,15 +39,17 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
   }
 
   def decision() = Action {  implicit request: Request[AnyContent] =>
-    Ok(views.html.predict(BasicForm.form))
+    Ok(views.html.index())
   }
 
+
   def simpleFormPost() = Action { implicit request =>
-    BasicForm.form.bindFromRequest.fold(
-      formWithErrors => {
+
+      val errorFunction = {formWithErrors: Form[BasicForm] =>
         BadRequest(views.html.predict(formWithErrors))
-      },
-      success = formData => {
+      }
+
+      val successFunction = { formData: BasicForm =>
         val formData: BasicForm = BasicForm.form.bindFromRequest.get
         val predictData = BasicForm.unapply(formData).get
 
@@ -58,7 +62,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
 
         Ok(views.html.predictresult(target, rf, lr))
       }
-    )
+
+      BasicForm.form.bindFromRequest.fold(errorFunction, successFunction)
   }
 
   def predictLR(predictData: (BigDecimal, Int, Int, BigDecimal, Int, Int, Int, Int, Int, Int)) : String = {
@@ -66,15 +71,16 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
   }
 
   def predictRF(predictData: (BigDecimal, Int, Int, BigDecimal, Int, Int, Int, Int, Int, Int)) : String = {
-    val spark = SparkSession.builder().appName("Analyze").master("local[*]").getOrCreate()
-    import spark.implicits._
-    val rfLoaded = PipelineModel.load("../main/Spark_ML/RandomForest_Pipeline_model")
-    val testDf = Seq(predictData).toDF("CreditUsage", "Age", "PastDue_30_59", "DebtRatio", "MonthlyIncome", "NumberOfOpenCreditLinesAndLoans", "PastDue_90", "NumberRealEstateLoansOrLines", "PastDue_60_89", "Dependents")
-    val testResDf = rfLoaded.transform(testDf)
-    val output = testResDf.select($"prediction").rdd.collect().map(x => x.getDouble(0))
-    output(0).toString() match {
-      case "0.0" => "Yes"
-      case "1.0" => "No"
-    }
+//    val spark = SparkSession.builder().appName("Analyze").master("local[*]").getOrCreate()
+//    import spark.implicits._
+//    val rfLoaded = PipelineModel.load("../main/Spark_ML/RandomForest_Pipeline_model")
+//    val testDf = Seq(predictData).toDF("CreditUsage", "Age", "PastDue_30_59", "DebtRatio", "MonthlyIncome", "NumberOfOpenCreditLinesAndLoans", "PastDue_90", "NumberRealEstateLoansOrLines", "PastDue_60_89", "Dependents")
+//    val testResDf = rfLoaded.transform(testDf)
+//    val output = testResDf.select($"prediction").rdd.collect().map(x => x.getDouble(0))
+//    output(0).toString() match {
+//      case "0.0" => "Yes"
+//      case "1.0" => "No"
+//    }
+    "Yes"
   }
 }
