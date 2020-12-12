@@ -13,6 +13,8 @@ target/
 # Spark
 .bsp
 derby.log
+_SUCCESS
+*.crc
 
 # mac
 .DS_Store

@@ -10,9 +10,8 @@ object RandomForest {
   def main(args: Array[String]): Unit = {
 
     // Load data
-    val cleanDf = Pre.process(Pre.loadData("./cs-training.csv")).cache()
-
-    // Random Forest
+    val cleanDf_tmp = Pre.process(Pre.loadData("./cs-training.csv")).cache()
+    val cleanDf = Pre.upSample(cleanDf_tmp).cache()
 
     val cols = Array(
       "CreditUsage", "Age", "PastDue_30_59", "DebtRatio",
@@ -24,26 +23,25 @@ object RandomForest {
     val assembler = new VectorAssembler()
       .setInputCols(cols)
       .setOutputCol("features")
-    val featureDf = assembler.transform(cleanDf)
 
+    // Define new 'label' column with 'result' column by labelIndexer
     val labelIndexer = new StringIndexer()
       .setInputCol("Target")
       .setOutputCol("label")
-    val labelDf = labelIndexer.fit(featureDf).transform(featureDf)
 
-    // evaluate model with area under ROC
+    // Evaluate model with area under ROC
     val evaluator = new BinaryClassificationEvaluator()
       .setLabelCol("label")
       .setMetricName("areaUnderROC")
       .setRawPredictionCol("rawPrediction")
 
-    // split data set training and test
+    // Split data set training and test
     // training data set - 70%
     // test data set - 30%
     val seed = 1225
-    val Array(trainingData, testData) = labelDf.randomSplit(Array(0.7, 0.3), seed)
+    val Array(pipelineTrainingData, pipelineTestingData) = cleanDf.randomSplit(Array(0.7, 0.3), seed)
 
-    // train Random Forest model with training data set
+    // New model
     val randomForestClassifier = new RandomForestClassifier()
       .setImpurity("gini")
       .setMaxDepth(3)
@@ -51,38 +49,25 @@ object RandomForest {
       .setFeatureSubsetStrategy("auto")
       .setSeed(seed)
 
-    val randomForestModel = randomForestClassifier.fit(trainingData)
-    // println(randomForestModel.toDebugString)
-
-    val predictionDf = randomForestModel.transform(testData)
-    // predictionDf.show(10)
-    // measure the accuracy
-    val accuracy = evaluator.evaluate(predictionDf)
-    println(s"Accuracy = ${accuracy}")
-
     // Build the Machine Learning/ Random Forest Model
-    val Array(pipelineTrainingData, pipelineTestingData) = cleanDf.randomSplit(Array(0.7, 0.3), seed)
-
     // VectorAssembler and StringIndexer are transformers
     val stages = Array(assembler, labelIndexer, randomForestClassifier)
 
-    // build pipeline
+    // Build pipeline
     val pipeline = new Pipeline().setStages(stages)
+
+    // Train model
     val pipelineModel = pipeline.fit(pipelineTrainingData)
 
-    // test model with test data
+    // Test model with test data
     val pipelinePredictionDf = pipelineModel.transform(pipelineTestingData)
-    // pipelinePredictionDf.show(10)
 
-    // measure the accuracy
+    // Measure the accuracy
     val pipelineAccuracy = evaluator.evaluate(pipelinePredictionDf)
-    println(s"Pipeline Accuracy = ${pipelineAccuracy}")
+    println(s"Random Forest Pipeline Accuracy = ${pipelineAccuracy}")
 
-    // save model
-    randomForestModel.write.overwrite().save("./RandomForest_model")
-
-    pipelineModel.write.overwrite().save("./RandomForest_Pipeline_model")
-
+    // Save model
+    // pipelineModel.write.overwrite().save("./RandomForest_Pipeline_model_2")
     Pre.spark.stop()
   }
 }
