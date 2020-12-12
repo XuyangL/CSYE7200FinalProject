@@ -1,5 +1,5 @@
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql. types._
+import org.apache.spark.sql.types._
 
 class PreProcess {
   val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
@@ -29,7 +29,6 @@ class PreProcess {
       .schema(schema)
       .format("com.databricks.spark.csv")
       .load(file)
-      .distinct()
       .toDF()
       .cache()
 
@@ -73,6 +72,21 @@ class PreProcess {
     val median_Dependents = spark.sql("SELECT percentile_approx(Dependents, 0.5) FROM cleanTemp3").first().getInt(0)
     val fillZeroDf3 = fillZeroDf2.na.fill(median_Dependents, Seq("Dependents"))
     println(s"--Ingestion Finish--.")
-    fillZeroDf3
+    val finalDf = fillZeroDf3.na.fill(0)
+    finalDf
+  }
+
+  def upSample(df: DataFrame): DataFrame = {
+    df.createOrReplaceTempView("sample")
+    val target_1 = spark.sql("SELECT * FROM sample WHERE Target = 1")
+    val unbalancedRatio = (100*(target_1.count().toDouble / df.count().toDouble)).round
+    val sampleRatio = (30 / unbalancedRatio).toInt
+    var seqDf = Seq[DataFrame]()
+    for (i <- 0 to sampleRatio) {
+      seqDf = target_1 +: seqDf
+    }
+    val reduceDf = seqDf.reduce(_ union _)
+    val finalDf = df.union(reduceDf)
+    finalDf
   }
 }
