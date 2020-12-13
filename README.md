@@ -13,8 +13,8 @@ The project focused on the basic prediction of the probability that someone will
 ### **Models**
 Both Random Forest Model and Logistic Regression are using for predicting the probability that someone will experience financial distress in the next two years
 
-For Random Forest, it will generate a binary result either yes or no.
-For Logistic Regression, the result will generate a number from 0 to 1.
+* `For Random Forest`: it will generate a binary result either yes or no.
+* `For Logistic Regression`: the result will generate a number from 0 to 1.
 
 #### **Data** 
 ```
