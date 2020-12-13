@@ -17,9 +17,12 @@ For Random Forest, it will generate a binary result either yes or no.
 For Logistic Regression, the result will generate a number from 0 to 1.
 
 #### **Data** 
-train.csv: Dataset for training models
-test.csv: Dataset for using models to make predictions and evaluate models' performance
-
+```
+        >train.csv: Dataset for training models
+```
+```
+        >test.csv: Dataset for using models to make predictions and evaluate models' performance
+```
 You can download datasets from [https://www.kaggle.com/c/GiveMeSomeCredit/data?select=cs-training.csv]
 
 ## Predicted system:
