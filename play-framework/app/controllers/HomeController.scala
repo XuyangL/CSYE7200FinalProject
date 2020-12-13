@@ -23,8 +23,8 @@ import scala.concurrent.Future
 class HomeController @Inject()(val controllerComponents: ControllerComponents) extends BaseController with play.api.i18n.I18nSupport{
   val spark = SparkSession.builder().master("local").getOrCreate()
   import spark.implicits._
-  val lrLoaded = PipelineModel.load("../main/Spark_ML/LogisticRegression_Pipeline_model")
-  val rfLoaded = PipelineModel.load("../main/Spark_ML/RandomForest_Pipeline_model")
+  val lrLoaded = PipelineModel.load("../Spark_ML/LogisticRegression_Pipeline_model")
+  val rfLoaded = PipelineModel.load("../Spark_ML/RandomForest_Pipeline_model")
     
   val recordDao = RecordDao
   /**
