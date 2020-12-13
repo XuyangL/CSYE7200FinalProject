@@ -21,7 +21,11 @@ import scala.concurrent.Future
  */
 @Singleton
 class HomeController @Inject()(val controllerComponents: ControllerComponents) extends BaseController with play.api.i18n.I18nSupport{
-
+  val spark = SparkSession.builder().master("local").getOrCreate()
+  import spark.implicits._
+  val lrLoaded = PipelineModel.load("../main/Spark_ML/LogisticRegression_Pipeline_model")
+  val rfLoaded = PipelineModel.load("../main/Spark_ML/RandomForest_Pipeline_model")
+    
   val recordDao = RecordDao
   /**
    * Create an Action to render an HTML page.
@@ -104,20 +108,14 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
   }
 
   def predictLR(predictData: (BigDecimal, Int, Int, BigDecimal, Int, Int, Int, Int, Int, Int)) : String = {
-    val spark = SparkSession.builder().master("local").getOrCreate()
-    import spark.implicits._
-    val rfLoaded = PipelineModel.load("../main/Spark_ML/LogisticRegression_Pipeline_model")
     val testDf = Seq(predictData).toDF("CreditUsage", "Age", "PastDue_30_59", "DebtRatio", "MonthlyIncome", "NumberOfOpenCreditLinesAndLoans", "PastDue_90", "NumberRealEstateLoansOrLines", "PastDue_60_89", "Dependents")
-    val testResDf = rfLoaded.transform(testDf)
+    val testResDf = lrLoaded.transform(testDf)
     val output = testResDf.select($"prediction").rdd.collect().map(x => x.getDouble(0))
     output(0).toString()
     //"0.85".toString
   }
 
   def predictRF(predictData: (BigDecimal, Int, Int, BigDecimal, Int, Int, Int, Int, Int, Int)) : String = {
-    val spark = SparkSession.builder().master("local").getOrCreate()
-    import spark.implicits._
-    val rfLoaded = PipelineModel.load("../main/Spark_ML/RandomForest_Pipeline_model")
     val testDf = Seq(predictData).toDF("CreditUsage", "Age", "PastDue_30_59", "DebtRatio", "MonthlyIncome", "NumberOfOpenCreditLinesAndLoans", "PastDue_90", "NumberRealEstateLoansOrLines", "PastDue_60_89", "Dependents")
     val testResDf = rfLoaded.transform(testDf)
     val output = testResDf.select($"prediction").rdd.collect().map(x => x.getDouble(0))
